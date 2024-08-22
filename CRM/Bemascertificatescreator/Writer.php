@@ -23,7 +23,4 @@ class CRM_Bemascertificatescreator_Writer {
     $this->certificateDirectory = BEMAS_CERTIFICATES_ROOT . "/$year/$eventCode";
   }
 
-
-
-
 }
