@@ -6,7 +6,7 @@ class CRM_Bemascertificatescreator_Generator {
   }
 
   public function createForEvent(int $eventId): string {
-    $eventJsonCreated = "No, event $eventId not found";
+    $eventJsonCreated = "Event $eventId not found";
     $numParticipantsCreated = 0;
 
     $event = new CRM_Bemascertificatescreator_Event($eventId);
@@ -34,12 +34,12 @@ class CRM_Bemascertificatescreator_Generator {
   }
 
   public function createForParticipant(int $participantId): string {
-    $eventJsonCreated = "No, event of particpant $participantId not found";
+    $eventJsonCreated = "No! Error ==> particpant $participantId not found";
     $numParticipantsCreated = 0;
 
     $participant = new CRM_Bemascertificatescreator_Participant($participantId);
     $event = new CRM_Bemascertificatescreator_Event($participant->eventId);
-    if ($event && $this->isEventTypeAllowedForCertificate($event->event_type_id)) {
+    if ($event && $this->isEventTypeAllowedForCertificate($event->typeId)) {
       $writer = new CRM_Bemascertificatescreator_Writer($event->year, $event->code);
 
       if (!$writer->eventJsonExists() || $this->forceCreation) {
@@ -51,13 +51,15 @@ class CRM_Bemascertificatescreator_Generator {
         $eventJsonCreated = 'No, already exists';
       }
 
+      // TODO: contact ophalen en meegeven aan toJson samen met event
+      // + rekening houden met participant status
       $participant = new CRM_Bemascertificatescreator_Participant($participantId);
       $writer->saveParticipantJson($participant->toJson());
 
       $numParticipantsCreated++;
     }
 
-    return "Event json created: $eventJsonCreated, #Participant json created: $numParticipantsCreated";
+    return "Event json created? $eventJsonCreated, #Participant json created: $numParticipantsCreated";
   }
 
   public function createForContact(int $contactId): string {
@@ -66,6 +68,13 @@ class CRM_Bemascertificatescreator_Generator {
     return 'ok';
   }
 
+  private function isEventTypeAllowedForCertificate($eventTypeId) {
+    if ($eventTypeId == 17) {
+      return FALSE; // Meeting
+    }
+
+    return TRUE;
+  }
 
 
 }

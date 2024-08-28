@@ -1,9 +1,9 @@
 <?php
 
 class CRM_Bemascertificatescreator_Writer {
-  private $certificateDirectory = '';
+  public $certificateDirectory = '';
 
-  public function __construct(int $year, string $eventCode) {
+  public function __construct(public int $year, public string $eventCode) {
     if (!defined('BEMAS_CERTIFICATES_ROOT')) {
       throw new Exception('The constant BEMAS_CERTIFICATES_ROOT must be defined in civicrm.settings.php');
     }
@@ -22,5 +22,46 @@ class CRM_Bemascertificatescreator_Writer {
 
     $this->certificateDirectory = BEMAS_CERTIFICATES_ROOT . "/$year/$eventCode";
   }
+
+  public function eventJsonExists() {
+    if (is_file($this->certificateDirectory . '/' . $this->eventCode . '.json')) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  public function saveEventJson($json) {
+    $path = $this->certificateDirectory . '/' . $this->eventCode . '.json';
+    $this->writeFile($path, $json);
+    return $path;
+  }
+
+  public function saveParticipantJson($json) {
+    $path = $this->certificateDirectory . '/' . $this->eventCode . '/' . $this->getGUID() . '.json';
+    $this->writeFile($path, $json);
+    return $path;
+  }
+
+  private function writeFile($fileName, $content) {
+    $stream = fopen($fileName, 'w');
+    fwrite($stream, $content);
+    fclose($stream);
+  }
+
+  private function getGUID() {
+    // Generate 16 bytes (128 bits) of random data or use the data passed into the function.
+    $data = random_bytes(16);
+
+    // Set version to 0100
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+    // Set bits 6-7 to 10
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+    // Output the 36 character UUID.
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+  }
+
 
 }
