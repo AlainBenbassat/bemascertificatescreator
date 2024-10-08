@@ -43,12 +43,27 @@ class CRM_Bemascertificatescreator_Event {
     }
   }
 
+  public function getParticipantIds() {
+    $ids = [];
+
+    $participants = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('event_id', '=', $this->id)
+      ->addWhere('status_id.is_counted', '=', TRUE)
+      ->execute();
+    foreach ($participants as $participant) {
+      $ids[] = $participant['id'];
+    }
+
+    return $ids;
+  }
+
   public function toJson() {
-    $json = '{';
-    $json .= '  "course_title": "' . $this->title . '",';
-    $json .= '  "course_summary": "' . $this->summary . '",';
-    $json .= '  "course_description": "' . $this->description . '"';
-    $json .= '}';
+    $json = "{\n";
+    $json .= '  "course_title": "' . $this->title . "\",\n";
+    $json .= '  "course_summary": "' . $this->summary . "\",\n";
+    $json .= '  "course_description": "' . $this->description . "\"\n";
+    $json .= "}\n";
 
     return $json;
   }

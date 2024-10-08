@@ -32,19 +32,19 @@ class CRM_Bemascertificatescreator_Writer {
     }
   }
 
-  public function saveEventJson($json) {
+  public function saveEventJson(string $json): string {
     $path = $this->certificateDirectory . '/' . $this->eventCode . '.json';
     $this->writeFile($path, $json);
     return $path;
   }
 
-  public function saveParticipantJson($json) {
-    $path = $this->certificateDirectory . '/' . $this->eventCode . '/' . $this->getGUID() . '.json';
+  public function saveParticipantJson(string $json): string {
+    $path = $this->certificateDirectory . '/' . $this->getGUID() . '.json';
     $this->writeFile($path, $json);
     return $path;
   }
 
-  private function writeFile($fileName, $content) {
+  private function writeFile(string $fileName, string $content) {
     $stream = fopen($fileName, 'w');
     fwrite($stream, $content);
     fclose($stream);

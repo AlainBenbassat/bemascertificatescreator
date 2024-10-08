@@ -2,15 +2,13 @@
 
 class CRM_Bemascertificatescreator_Generator {
   public function __construct(private bool $forceCreation = FALSE) {
-
   }
 
   public function createForEvent(int $eventId): string {
-    $eventJsonCreated = "Event $eventId not found";
     $numParticipantsCreated = 0;
 
     $event = new CRM_Bemascertificatescreator_Event($eventId);
-    if ($event && $this->isEventTypeAllowedForCertificate($event->event_type_id)) {
+    if ($this->isEventTypeAllowedForCertificate($event->typeId)) {
       $writer = new CRM_Bemascertificatescreator_Writer($event->year, $event->code);
 
       if (!$writer->eventJsonExists() || $this->forceCreation) {
@@ -23,54 +21,31 @@ class CRM_Bemascertificatescreator_Generator {
       }
 
       foreach ($event->getParticipantIds() as $participantId) {
-        $participant = new CRM_Bemascertificatescreator_Participant($participantId);
+        $participant = new CRM_Bemascertificatescreator_Participant($participantId, $event);
         $writer->saveParticipantJson($participant->toJson());
 
         $numParticipantsCreated++;
       }
-    }
 
-    return "Event json created: $eventJsonCreated, #Participant json created: $numParticipantsCreated";
+      return "Event json created: $eventJsonCreated, #Participant json created: $numParticipantsCreated";
+    }
+    else {
+      return 'Event json not created. Event type ' . $event->typeId . ' is not valid';
+    }
   }
 
   public function createForParticipant(int $participantId): string {
-    $eventJsonCreated = "No! Error ==> particpant $participantId not found";
-    $numParticipantsCreated = 0;
-
-    $participant = new CRM_Bemascertificatescreator_Participant($participantId);
-    $event = new CRM_Bemascertificatescreator_Event($participant->eventId);
-    if ($event && $this->isEventTypeAllowedForCertificate($event->typeId)) {
-      $writer = new CRM_Bemascertificatescreator_Writer($event->year, $event->code);
-
-      if (!$writer->eventJsonExists() || $this->forceCreation) {
-        $writer->saveEventJson($event->toJson());
-
-        $eventJsonCreated = 'Yes';
-      }
-      else {
-        $eventJsonCreated = 'No, already exists';
-      }
-
-      // TODO: contact ophalen en meegeven aan toJson samen met event
-      // + rekening houden met participant status
-      $participant = new CRM_Bemascertificatescreator_Participant($participantId);
-      $writer->saveParticipantJson($participant->toJson());
-
-      $numParticipantsCreated++;
-    }
-
-    return "Event json created? $eventJsonCreated, #Participant json created: $numParticipantsCreated";
+    die('WORK IN PROGRESS');
   }
 
   public function createForContact(int $contactId): string {
-    $w = new CRM_Bemascertificatescreator_Writer(2034, 'TESTALAIN');
-
-    return 'ok';
+    die('WORK IN PROGRESS');
   }
 
   private function isEventTypeAllowedForCertificate($eventTypeId) {
-    if ($eventTypeId == 17) {
-      return FALSE; // Meeting
+    // Not allowed for: invalid = 0, conferentie = 10, Meeting = 17
+    if ($eventTypeId == 0 || $eventTypeId == 10 || $eventTypeId == 17) {
+      return FALSE;
     }
 
     return TRUE;
