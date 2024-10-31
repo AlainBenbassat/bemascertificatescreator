@@ -52,6 +52,18 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
   }
 
   public function postProcess(): void {
+    $values = $this->exportValues();
+    $event = new CRM_Bemascertificatescreator_Event($values['event_id']);
+    $event->titleWithoutCodeEN = $values['title_en'];
+    $event->titleWithoutCodeNL = $values['title_nl'];
+    $event->titleWithoutCodeFR = $values['title_fr'];
+    $event->descriptionEN = $values['description_en'];
+    $event->descriptionNL = $values['description_nl'];
+    $event->descriptionFR = $values['description_fr'];
+
+    $generator = new CRM_Bemascertificatescreator_Generator();
+    $msg = $generator->createForEvent($event);
+    CRM_Core_Session::setStatus($msg, '', 'alert');
   }
 
   private function getJsonField(object $eventCertificate, string $lang, string $fieldName): string {

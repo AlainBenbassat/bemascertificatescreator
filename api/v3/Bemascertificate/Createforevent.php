@@ -12,7 +12,8 @@ function civicrm_api3_bemascertificate_Createforevent($params) {
 
   try {
     $certificateGenerator = new CRM_Bemascertificatescreator_Generator();
-    $msg = $certificateGenerator->createForEvent($params['event_id']);
+    $event = new CRM_Bemascertificatescreator_Event($params['event_id']);
+    $msg = $certificateGenerator->createForEvent($event);
 
     return civicrm_api3_create_success($msg, $params, 'Bemascertificate', 'Createforevent');
   }

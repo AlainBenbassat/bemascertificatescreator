@@ -1,24 +1,18 @@
 <?php
 
 class CRM_Bemascertificatescreator_Generator {
-  public function __construct(private bool $forceCreation = FALSE) {
+  public function __construct() {
+    die("TODO: (1) url certificaat bewaren bij deelnemer + hergebruiken indien het bestaat. (2) locatie en trainers in event certificaat toevoegen");
   }
 
-  public function createForEvent(int $eventId): string {
+  public function createForEvent(CRM_Bemascertificatescreator_Event $event): string {
     $numParticipantsCreated = 0;
 
-    $event = new CRM_Bemascertificatescreator_Event($eventId);
     if ($this->isEventTypeAllowedForCertificate($event->typeId)) {
       $certFS = new CRM_Bemascertificatescreator_FileSystem($event->year, $event->code);
+      $certFS->saveEventJson($event->toJson());
 
-      if (!$certFS->eventJsonExists() || $this->forceCreation) {
-        $certFS->saveEventJson($event->toJson());
-
-        $eventJsonCreated = 'Yes';
-      }
-      else {
-        $eventJsonCreated = 'No, already exists';
-      }
+      $eventJsonCreated = 'Yes';
 
       foreach ($event->getParticipantIds() as $participantId) {
         $participant = new CRM_Bemascertificatescreator_Participant($participantId, $event);
@@ -30,7 +24,7 @@ class CRM_Bemascertificatescreator_Generator {
       return "Event json created: $eventJsonCreated, #Participant json created: $numParticipantsCreated";
     }
     else {
-      return 'Event json not created. Event type ' . $event->typeId . ' is not valid';
+      return 'Event json not created. Event type id = ' . $event->typeId . ' cannot have certificates';
     }
   }
 

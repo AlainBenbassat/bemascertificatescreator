@@ -51,6 +51,10 @@ class CRM_Bemascertificatescreator_FileSystem {
 
   private function writeFile(string $fileName, string $content) {
     $stream = fopen($fileName, 'w');
+    if ($stream === FALSE) {
+      throw new Exception("Cannot open $fileName");
+    }
+
     fwrite($stream, $content);
     fclose($stream);
   }

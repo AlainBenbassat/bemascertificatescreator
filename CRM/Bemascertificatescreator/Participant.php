@@ -37,12 +37,16 @@ class CRM_Bemascertificatescreator_Participant {
   }
 
   public function toJson() {
-    $json = "{\n";
-    $json .= '  "first_name": "' . $this->firstName . "\",\n";
-    $json .= '  "last_name": "' . $this->lastName . "\",\n";
-    $json .= '  "course_title": "' . $this->event->title . "\",\n";
-    $json .= '  "course_date": "' . $this->event->startDate . "\"\n";
-    $json .= "}\n";
+$json = <<<EOF
+{
+  "first_name": "$this->firstName",
+  "last_name": "$this->lastName",
+  "course_id": "{$this->event->id}",
+  "course_code": "{$this->event->code}",
+  "course_date": "{$this->event->startDate}"
+}
+
+EOF;
 
     return $json;
   }

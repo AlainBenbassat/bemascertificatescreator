@@ -9,8 +9,10 @@ class CRM_Bemascertificatescreator_Event {
   public string $titleWithoutCodeNL;
   public string $titleWithoutCodeFR;
   public int $typeId;
-  public string $summary;
   public string $description;
+  public string $descriptionEN;
+  public string $descriptionNL;
+  public string $descriptionFR;
   public string $startDate;
   public int $year;
 
@@ -20,7 +22,7 @@ class CRM_Bemascertificatescreator_Event {
 
   public function load(int $eventId): void {
     $event = \Civi\Api4\Event::get(FALSE)
-      ->addSelect('id', 'event_type_id', 'summary', 'title', 'description', 'start_date')
+      ->addSelect('id', 'event_type_id', 'title', 'description', 'start_date')
       ->addWhere('id', '=', $eventId)
       ->execute()
       ->first();
@@ -29,46 +31,41 @@ class CRM_Bemascertificatescreator_Event {
       $this->id = $event['id'];
       $this->title = $event['title'];
       $this->typeId = $event['event_type_id'];
-      $this->summary = $event['summary'] ?? '';
       $this->description = $event['description'] ?? '';
       $this->startDate = $event['start_date'];
       $this->year = substr($this->startDate, 0, 4);
       $this->code = $this->extractCodeFromTitle($this->title);
       $this->titleWithoutCode = $this->removeCodeFromTitle($this->code, $this->title);
 
-      // get EN title
+      // get EN title and description
       $event = \Civi\Api4\Event::get(FALSE)
-        ->addSelect('title')
+        ->addSelect('title', 'description')
         ->addWhere('id', '=', $eventId)
         ->setLanguage('en_US')
         ->execute()
         ->first();
-      if ($event && $event['title']) {
-        $this->titleWithoutCodeEN = $this->removeCodeFromTitle($this->code, $event['title']);
-      }
+      $this->titleWithoutCodeEN = $event['title'] ? $this->removeCodeFromTitle($this->code, $event['title']) : $this->titleWithoutCode;
+      $this->descriptionEN = $event['description'] ?? $this->description;
 
-      // get NL title
+      // get NL title and description
       $event = \Civi\Api4\Event::get(FALSE)
-        ->addSelect('title')
+        ->addSelect('title', 'description')
         ->addWhere('id', '=', $eventId)
         ->setLanguage('nl_NL')
         ->execute()
         ->first();
-      if ($event && $event['title']) {
-        $this->titleWithoutCodeNL = $this->removeCodeFromTitle($this->code, $event['title']);
-      }
+      $this->titleWithoutCodeNL = $event['title'] ? $this->removeCodeFromTitle($this->code, $event['title']) : $this->titleWithoutCode;
+      $this->descriptionNL = $event['description'] ?? $this->description;
 
-      // get FR title
+      // get FR title and description
       $event = \Civi\Api4\Event::get(FALSE)
-        ->addSelect('title')
+        ->addSelect('title', 'description')
         ->addWhere('id', '=', $eventId)
         ->setLanguage('fr_FR')
         ->execute()
         ->first();
-      if ($event && $event['title']) {
-        $this->titleWithoutCodeFR = $this->removeCodeFromTitle($this->code, $event['title']);
-      }
-
+      $this->titleWithoutCodeFR = $event['title'] ? $this->removeCodeFromTitle($this->code, $event['title']) : $this->titleWithoutCode;
+      $this->descriptionFR = $event['description'] ?? $this->description;
     }
     else {
       $this->id = 0;
@@ -102,11 +99,28 @@ class CRM_Bemascertificatescreator_Event {
   }
 
   public function toJson() {
-    $json = "{\n";
-    $json .= '  "course_title": "' . $this->title . "\",\n";
-    $json .= '  "course_summary": "' . $this->summary . "\",\n";
-    $json .= '  "course_description": "' . $this->description . "\"\n";
-    $json .= "}\n";
+$json = <<<EOF
+{
+  "en": {
+    "course_id": "$this->id",
+    "course_code": "$this->code",
+    "course_title": "$this->titleWithoutCodeEN",
+    "course_description": "$this->descriptionEN"
+  },
+  "nl": {
+    "course_id": "$this->id",
+    "course_code": "$this->code",
+    "course_title": "$this->titleWithoutCodeNL",
+    "course_description": "$this->descriptionNL"
+  },
+  "fr": {
+    "course_id": "$this->id",
+    "course_code": "$this->code",
+    "course_title": "$this->titleWithoutCodeFR",
+    "course_description": "$this->descriptionFR"
+  }
+}
+EOF;
 
     return $json;
   }
