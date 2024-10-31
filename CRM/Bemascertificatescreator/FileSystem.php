@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Bemascertificatescreator_Writer {
+class CRM_Bemascertificatescreator_FileSystem {
   public $certificateDirectory = '';
 
   public function __construct(public int $year, public string $eventCode) {
@@ -38,6 +38,11 @@ class CRM_Bemascertificatescreator_Writer {
     return $path;
   }
 
+  public function loadEventJson() {
+    $path = $this->certificateDirectory . '/' . $this->eventCode . '.json';
+    return $this->readFile($path);
+  }
+
   public function saveParticipantJson(string $json): string {
     $path = $this->certificateDirectory . '/' . $this->getGUID() . '.json';
     $this->writeFile($path, $json);
@@ -48,6 +53,10 @@ class CRM_Bemascertificatescreator_Writer {
     $stream = fopen($fileName, 'w');
     fwrite($stream, $content);
     fclose($stream);
+  }
+
+  private function readFile(string $fileName) {
+    return file_get_contents($fileName);
   }
 
   private function getGUID() {

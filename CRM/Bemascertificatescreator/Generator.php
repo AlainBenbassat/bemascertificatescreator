@@ -9,10 +9,10 @@ class CRM_Bemascertificatescreator_Generator {
 
     $event = new CRM_Bemascertificatescreator_Event($eventId);
     if ($this->isEventTypeAllowedForCertificate($event->typeId)) {
-      $writer = new CRM_Bemascertificatescreator_Writer($event->year, $event->code);
+      $certFS = new CRM_Bemascertificatescreator_FileSystem($event->year, $event->code);
 
-      if (!$writer->eventJsonExists() || $this->forceCreation) {
-        $writer->saveEventJson($event->toJson());
+      if (!$certFS->eventJsonExists() || $this->forceCreation) {
+        $certFS->saveEventJson($event->toJson());
 
         $eventJsonCreated = 'Yes';
       }
@@ -22,7 +22,7 @@ class CRM_Bemascertificatescreator_Generator {
 
       foreach ($event->getParticipantIds() as $participantId) {
         $participant = new CRM_Bemascertificatescreator_Participant($participantId, $event);
-        $writer->saveParticipantJson($participant->toJson());
+        $certFS->saveParticipantJson($participant->toJson());
 
         $numParticipantsCreated++;
       }
