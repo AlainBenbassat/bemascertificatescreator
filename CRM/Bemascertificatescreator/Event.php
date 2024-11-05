@@ -15,6 +15,7 @@ class CRM_Bemascertificatescreator_Event {
   public string $descriptionFR;
   public string $startDate;
   public int $year;
+  public string $languageCode;
 
   public function __construct(int $eventId) {
     $this->load($eventId);
@@ -35,6 +36,7 @@ class CRM_Bemascertificatescreator_Event {
       $this->startDate = $event['start_date'];
       $this->year = substr($this->startDate, 0, 4);
       $this->code = $this->extractCodeFromTitle($this->title);
+      $this->languageCode = $this->getLanguageFromCode();
       $this->titleWithoutCode = $this->removeCodeFromTitle($this->code, $this->title);
 
       // get EN title and description
@@ -137,5 +139,18 @@ EOF;
 
   private function removeCodeFromTitle(string $code, string $title) {
     return str_replace($code . ' - ', '', $title);
+  }
+
+  private function getLanguageFromCode() {
+    $lastChar = substr($this->code, -1);
+    if ($lastChar == 'W') {
+      return 'fr';
+    }
+    elseif ($lastChar == 'V') {
+      return 'nl';
+    }
+    else {
+      return 'en';
+    }
   }
 }

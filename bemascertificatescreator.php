@@ -29,4 +29,5 @@ function bemascertificatescreator_civicrm_install(): void {
  */
 function bemascertificatescreator_civicrm_enable(): void {
   _bemascertificatescreator_civix_civicrm_enable();
+  CRM_Bemascertificatescreator_Config::singleton()->create();
 }

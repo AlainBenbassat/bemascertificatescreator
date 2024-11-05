@@ -63,7 +63,7 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
 
     $generator = new CRM_Bemascertificatescreator_Generator();
     $msg = $generator->createForEvent($event);
-    CRM_Core_Session::setStatus($msg, '', 'alert');
+    CRM_Core_Session::setStatus($msg, '', 'info');
   }
 
   private function getJsonField(object $eventCertificate, string $lang, string $fieldName): string {

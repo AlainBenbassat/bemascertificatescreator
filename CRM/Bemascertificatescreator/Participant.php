@@ -6,6 +6,7 @@ class CRM_Bemascertificatescreator_Participant {
   public $statusId;
   public $firstName;
   public $lastName;
+  public $certificateUrl;
   public CRM_Bemascertificatescreator_Event $event;
 
   public function __construct(int $participantId, CRM_Bemascertificatescreator_Event $event) {
@@ -15,7 +16,7 @@ class CRM_Bemascertificatescreator_Participant {
 
   public function load(int $participantId): void {
     $participant = \Civi\Api4\Participant::get(FALSE)
-      ->addSelect('id', 'contact_id', 'event_id', 'status_id', 'contact_id.first_name', 'contact_id.last_name')
+      ->addSelect('id', 'contact_id', 'event_id', 'status_id', 'contact_id.first_name', 'contact_id.last_name', 'participant_certificate.certificate_url')
       ->addWhere('id', '=', $participantId)
       ->execute()
       ->first();
@@ -26,6 +27,7 @@ class CRM_Bemascertificatescreator_Participant {
       $this->statusId = $participant['status_id'];
       $this->firstName = $participant['contact_id.first_name'];
       $this->lastName = $participant['contact_id.last_name'];
+      $this->certificateUrl = $participant['participant_certificate.certificate_url'];
     }
     else {
       $this->id = 0;
@@ -33,7 +35,15 @@ class CRM_Bemascertificatescreator_Participant {
       $this->statusId = 0;
       $this->firstName = '';
       $this->lastName = '';
+      $this->certificateUrl = '';
     }
+  }
+
+  public function saveCertificate(string $certificateUrl) {
+    \Civi\Api4\Participant::update(FALSE)
+      ->addValue('participant_certificate.certificate_url', $certificateUrl)
+      ->addWhere('id', '=', $this->id)
+      ->execute();
   }
 
   public function toJson() {

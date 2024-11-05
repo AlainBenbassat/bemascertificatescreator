@@ -2,7 +2,7 @@
 
 class CRM_Bemascertificatescreator_Generator {
   public function __construct() {
-    die("TODO: (1) url certificaat bewaren bij deelnemer + hergebruiken indien het bestaat. (2) locatie en trainers in event certificaat toevoegen");
+    die("TODO: locatie en trainers in event certificaat toevoegen");
   }
 
   public function createForEvent(CRM_Bemascertificatescreator_Event $event): string {
@@ -16,7 +16,8 @@ class CRM_Bemascertificatescreator_Generator {
 
       foreach ($event->getParticipantIds() as $participantId) {
         $participant = new CRM_Bemascertificatescreator_Participant($participantId, $event);
-        $certFS->saveParticipantJson($participant->toJson());
+        $certificateUrl = $certFS->saveParticipantJson($participant->toJson(), $participant->certificateUrl, $event->languageCode);
+        $participant->saveCertificate($certificateUrl);
 
         $numParticipantsCreated++;
       }

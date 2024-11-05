@@ -2,10 +2,14 @@
 
 class CRM_Bemascertificatescreator_FileSystem {
   public $certificateDirectory = '';
+  public $certificateUrl = '';
 
   public function __construct(public int $year, public string $eventCode) {
     if (!defined('BEMAS_CERTIFICATES_ROOT')) {
       throw new Exception('The constant BEMAS_CERTIFICATES_ROOT must be defined in civicrm.settings.php');
+    }
+    if (!defined('BEMAS_CERTIFICATES_BASE_URL')) {
+      throw new Exception('The constant BEMAS_CERTIFICATES_BASE_URL must be defined in civicrm.settings.php');
     }
 
     if (!is_dir(BEMAS_CERTIFICATES_ROOT)) {
@@ -21,6 +25,7 @@ class CRM_Bemascertificatescreator_FileSystem {
     }
 
     $this->certificateDirectory = BEMAS_CERTIFICATES_ROOT . "/$year/$eventCode";
+    $this->certificateUrl = BEMAS_CERTIFICATES_BASE_URL . "/$eventCode";
   }
 
   public function eventJsonExists() {
@@ -43,10 +48,23 @@ class CRM_Bemascertificatescreator_FileSystem {
     return $this->readFile($path);
   }
 
-  public function saveParticipantJson(string $json): string {
-    $path = $this->certificateDirectory . '/' . $this->getGUID() . '.json';
+  public function saveParticipantJson(string $json, ?string $existingUrl, ?string $languageCode): string {
+    if ($existingUrl) {
+      // reuse the guid for the json file to overwrite the existing certificate
+      $certificateGuid = $this->extractGuidFromUrl($existingUrl) ?? $this->getGUID();
+    }
+    else {
+      $certificateGuid = $this->getGUID();
+    }
+
+    $path = $this->certificateDirectory . '/' . $certificateGuid . '.json';
     $this->writeFile($path, $json);
-    return $path;
+
+    if (empty($languageCode)) {
+      $languageCode = 'en';
+    }
+
+    return $this->certificateUrl . "/$languageCode/$certificateGuid";
   }
 
   private function writeFile(string $fileName, string $content) {
@@ -76,5 +94,15 @@ class CRM_Bemascertificatescreator_FileSystem {
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
   }
 
+  private function extractGuidFromUrl(string $existingUrl): string {
+    $parts = explode('/', $existingUrl);
+    $lastElement = count($parts) - 1;
+    if ($lastElement >= 0) {
+      return $parts[$lastElement];
+    }
+    else {
+      return '';
+    }
+  }
 
 }
