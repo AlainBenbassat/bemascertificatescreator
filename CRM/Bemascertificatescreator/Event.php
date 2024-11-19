@@ -13,7 +13,10 @@ class CRM_Bemascertificatescreator_Event {
   public string $descriptionEN;
   public string $descriptionNL;
   public string $descriptionFR;
-  public string $startDate;
+  public array $dates;
+  public string $datesEN;
+  public string $datesNL;
+  public string $datesFR;
   public int $year;
   public string $languageCode;
 
@@ -23,7 +26,7 @@ class CRM_Bemascertificatescreator_Event {
 
   public function load(int $eventId): void {
     $event = \Civi\Api4\Event::get(FALSE)
-      ->addSelect('id', 'event_type_id', 'title', 'description', 'start_date')
+      ->addSelect('*', 'custom.*')
       ->addWhere('id', '=', $eventId)
       ->execute()
       ->first();
@@ -33,8 +36,8 @@ class CRM_Bemascertificatescreator_Event {
       $this->title = $event['title'];
       $this->typeId = $event['event_type_id'];
       $this->description = $event['description'] ?? '';
-      $this->startDate = $event['start_date'];
-      $this->year = substr($this->startDate, 0, 4);
+      $this->dates = $this->getCourseDates($event);
+      $this->year = substr($this->dates[0], 0, 4);
       $this->code = $this->extractCodeFromTitle($this->title);
       $this->languageCode = $this->getLanguageFromCode();
       $this->titleWithoutCode = $this->removeCodeFromTitle($this->code, $this->title);
@@ -48,6 +51,7 @@ class CRM_Bemascertificatescreator_Event {
         ->first();
       $this->titleWithoutCodeEN = $event['title'] ? $this->removeCodeFromTitle($this->code, $event['title']) : $this->titleWithoutCode;
       $this->descriptionEN = $event['description'] ?? $this->description;
+      $this->datesEN = $this->convertDatesToString('en');
 
       // get NL title and description
       $event = \Civi\Api4\Event::get(FALSE)
@@ -58,6 +62,7 @@ class CRM_Bemascertificatescreator_Event {
         ->first();
       $this->titleWithoutCodeNL = $event['title'] ? $this->removeCodeFromTitle($this->code, $event['title']) : $this->titleWithoutCode;
       $this->descriptionNL = $event['description'] ?? $this->description;
+      $this->datesNL = $this->convertDatesToString('nl');
 
       // get FR title and description
       $event = \Civi\Api4\Event::get(FALSE)
@@ -68,6 +73,7 @@ class CRM_Bemascertificatescreator_Event {
         ->first();
       $this->titleWithoutCodeFR = $event['title'] ? $this->removeCodeFromTitle($this->code, $event['title']) : $this->titleWithoutCode;
       $this->descriptionFR = $event['description'] ?? $this->description;
+      $this->datesFR = $this->convertDatesToString('fr');
     }
     else {
       $this->id = 0;
@@ -78,7 +84,10 @@ class CRM_Bemascertificatescreator_Event {
       $this->typeId = 0;
       $this->summary = '';
       $this->description = '';
-      $this->startDate = '';
+      $this->dates = [];
+      $this->datesEN = '';
+      $this->datesNL = '';
+      $this->datesFR = '';
       $this->year = 0;
       $this->code = '';
       $this->titleWithoutCode = '';
@@ -153,4 +162,56 @@ EOF;
       return 'en';
     }
   }
+
+  private function getCourseDates($event) {
+    $courseDates = [];
+
+    if (empty($event['Activiteit_status.Datum_dag_1'])) {
+      $courseDates[] = $event['start_date'];
+    }
+    else {
+      for ($i = 1; $i <= 6; $i++) {
+        if (!empty($event["Activiteit_status.Datum_dag_$i"])) {
+          $courseDates[] = $event["Activiteit_status.Datum_dag_$i"];
+        }
+      }
+    }
+
+    return $courseDates;
+  }
+
+  private function convertDatesToString(string $lang): string {
+    $andWord = [
+      'en' => ' and ',
+      'nl' => ' en ',
+      'fr' => ' et ',
+    ];
+
+    if (count($this->dates) == 1) {
+      return $this->convertToDateMonthYear($this->dates[0]);
+    }
+
+    $tmp = '';
+    for ($i = 0; $i < count($this->dates); $i++) {
+      if ($i == 0) {
+        $tmp = $this->convertToDateMonthYear($this->dates[$i]);
+      }
+      elseif ($i == count($this->dates) - 1) {
+        $tmp .= $andWord[$lang] . $this->convertToDateMonthYear($this->dates[$i]);
+      }
+      else {
+        $tmp .= ', ' . $this->convertToDateMonthYear($this->dates[$i]);;
+      }
+    }
+
+    return $tmp;
+  }
+
+  private function convertToDateMonthYear(string $date): string {
+    $d = substr($date, 8, 2);
+    $m = substr($date, 5, 2);
+    $y = substr($date, 0, 4);
+    return "$d-$m-$y";
+  }
+
 }

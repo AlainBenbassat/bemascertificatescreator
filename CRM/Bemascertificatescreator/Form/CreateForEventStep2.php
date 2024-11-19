@@ -36,6 +36,12 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
         'description_en' => $this->getJsonField($eventCertificate, 'en', 'course_description'),
         'description_nl' => $this->getJsonField($eventCertificate, 'nl', 'course_description'),
         'description_fr' => $this->getJsonField($eventCertificate, 'fr', 'course_description'),
+        'location_en' => $this->getJsonField($eventCertificate, 'en', 'course_location'),
+        'location_nl' => $this->getJsonField($eventCertificate, 'nl', 'course_location'),
+        'location_fr' => $this->getJsonField($eventCertificate, 'fr', 'course_location'),
+        'dates_en' => $this->getJsonField($eventCertificate, 'en', 'course_dates'),
+        'dates_nl' => $this->getJsonField($eventCertificate, 'nl', 'course_dates'),
+        'dates_fr' => $this->getJsonField($eventCertificate, 'fr', 'course_dates'),
       ];
     }
     else {
@@ -45,6 +51,12 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
         'title_en' => $event->titleWithoutCodeEN,
         'title_nl' => $event->titleWithoutCodeNL,
         'title_fr' => $event->titleWithoutCodeFR,
+        'location_en' => 'TODO',
+        'location_nl' => 'TODO',
+        'location_fr' => 'TODO',
+        'dates_en' => $event->datesEN,
+        'dates_nl' => $event->datesNL,
+        'dates_fr' => $event->datesFR,
       ];;
     }
 
@@ -76,12 +88,18 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
 
     $this->add('text', 'title_nl', 'Titel opleiding (NL)', ['size' => 80]);
     $this->add('textarea', 'description_nl', 'Omschrijving (NL)', ['cols' => 80]);
+    $this->add('text', 'location_nl', 'Locaties (NL)', ['size' => 80]);
+    $this->add('text', 'dates_nl', 'Datums (NL)', ['size' => 80]);
 
     $this->add('text', 'title_fr', 'Titel opleiding (FR)', ['size' => 80]);
     $this->add('textarea', 'description_fr', 'Omschrijving (FR)', ['cols' => 80]);
+    $this->add('text', 'location_fr', 'Locaties (FR)', ['size' => 80]);
+    $this->add('text', 'dates_fr', 'Datums (FR)', ['size' => 80]);
 
     $this->add('text', 'title_en', 'Title opleiding (EN)', ['size' => 80]);
     $this->add('textarea', 'description_en', 'Omschrijving (EN)', ['cols' => 80]);
+    $this->add('text', 'location_en', 'Locaties (EN)', ['size' => 80]);
+    $this->add('text', 'dates_en', 'Datums (EN)', ['size' => 80]);
   }
 
   private function addFormButtons() {
