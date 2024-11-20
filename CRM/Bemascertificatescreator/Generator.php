@@ -2,7 +2,7 @@
 
 class CRM_Bemascertificatescreator_Generator {
   public function __construct() {
-    die("TODO: locatie en trainers in event certificaat toevoegen");
+    //die("TODO: locatie en trainers in event certificaat toevoegen");
   }
 
   public function createForEvent(CRM_Bemascertificatescreator_Event $event): string {

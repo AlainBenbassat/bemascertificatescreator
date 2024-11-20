@@ -51,9 +51,9 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
         'title_en' => $event->titleWithoutCodeEN,
         'title_nl' => $event->titleWithoutCodeNL,
         'title_fr' => $event->titleWithoutCodeFR,
-        'location_en' => 'TODO',
-        'location_nl' => 'TODO',
-        'location_fr' => 'TODO',
+        'location_en' => $event->location,
+        'location_nl' => $event->location,
+        'location_fr' => $event->location,
         'dates_en' => $event->datesEN,
         'dates_nl' => $event->datesNL,
         'dates_fr' => $event->datesFR,
@@ -88,17 +88,17 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
 
     $this->add('text', 'title_nl', 'Titel opleiding (NL)', ['size' => 80]);
     $this->add('textarea', 'description_nl', 'Omschrijving (NL)', ['cols' => 80]);
-    $this->add('text', 'location_nl', 'Locaties (NL)', ['size' => 80]);
+    $this->add('text', 'location_nl', 'Locatie (NL)', ['size' => 80]);
     $this->add('text', 'dates_nl', 'Datums (NL)', ['size' => 80]);
 
     $this->add('text', 'title_fr', 'Titel opleiding (FR)', ['size' => 80]);
     $this->add('textarea', 'description_fr', 'Omschrijving (FR)', ['cols' => 80]);
-    $this->add('text', 'location_fr', 'Locaties (FR)', ['size' => 80]);
+    $this->add('text', 'location_fr', 'Locatie (FR)', ['size' => 80]);
     $this->add('text', 'dates_fr', 'Datums (FR)', ['size' => 80]);
 
     $this->add('text', 'title_en', 'Title opleiding (EN)', ['size' => 80]);
     $this->add('textarea', 'description_en', 'Omschrijving (EN)', ['cols' => 80]);
-    $this->add('text', 'location_en', 'Locaties (EN)', ['size' => 80]);
+    $this->add('text', 'location_en', 'Locatie (EN)', ['size' => 80]);
     $this->add('text', 'dates_en', 'Datums (EN)', ['size' => 80]);
   }
 

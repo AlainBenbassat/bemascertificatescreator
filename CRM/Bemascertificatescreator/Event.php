@@ -19,6 +19,8 @@ class CRM_Bemascertificatescreator_Event {
   public string $datesFR;
   public int $year;
   public string $languageCode;
+  public string $location;
+  public array $trainers;
 
   public function __construct(int $eventId) {
     $this->load($eventId);
@@ -41,6 +43,8 @@ class CRM_Bemascertificatescreator_Event {
       $this->code = $this->extractCodeFromTitle($this->title);
       $this->languageCode = $this->getLanguageFromCode();
       $this->titleWithoutCode = $this->removeCodeFromTitle($this->code, $this->title);
+      $this->location = $this->getLocation($event['Opleiding_lesduur.Eventlocatie']);
+      $this->trainers = $this->getTrainers($event['id']);
 
       // get EN title and description
       $event = \Civi\Api4\Event::get(FALSE)
@@ -91,6 +95,8 @@ class CRM_Bemascertificatescreator_Event {
       $this->year = 0;
       $this->code = '';
       $this->titleWithoutCode = '';
+      $this->location = '';
+      $this->trainers = [];
     }
   }
 
@@ -101,6 +107,7 @@ class CRM_Bemascertificatescreator_Event {
       ->addSelect('id')
       ->addWhere('event_id', '=', $this->id)
       ->addWhere('status_id.is_counted', '=', TRUE)
+      ->addWhere('role_id', 'IN', [1])
       ->execute();
     foreach ($participants as $participant) {
       $ids[] = $participant['id'];
@@ -110,25 +117,36 @@ class CRM_Bemascertificatescreator_Event {
   }
 
   public function toJson() {
+    $courseTrainersJson = '"' . implode('", "', $this->trainers) . '"';
+
 $json = <<<EOF
 {
   "en": {
     "course_id": "$this->id",
     "course_code": "$this->code",
     "course_title": "$this->titleWithoutCodeEN",
-    "course_description": "$this->descriptionEN"
+    "course_description": "$this->descriptionEN",
+    "course_dates": "$this->datesEN",
+    "course_location": "$this->location",
+    "course_trainers": [$courseTrainersJson]
   },
   "nl": {
     "course_id": "$this->id",
     "course_code": "$this->code",
     "course_title": "$this->titleWithoutCodeNL",
-    "course_description": "$this->descriptionNL"
+    "course_description": "$this->descriptionNL",
+    "course_dates": "$this->datesNL",
+    "course_location": "$this->location",
+    "course_trainers": [$courseTrainersJson]
   },
   "fr": {
     "course_id": "$this->id",
     "course_code": "$this->code",
     "course_title": "$this->titleWithoutCodeFR",
-    "course_description": "$this->descriptionFR"
+    "course_description": "$this->descriptionFR",
+    "course_dates": "$this->datesFR",
+    "course_location": "$this->location",
+    "course_trainers": [$courseTrainersJson]
   }
 }
 EOF;
@@ -211,7 +229,47 @@ EOF;
     $d = substr($date, 8, 2);
     $m = substr($date, 5, 2);
     $y = substr($date, 0, 4);
-    return "$d-$m-$y";
+    return "$d/$m/$y";
   }
 
+  private function getLocation($contactId) {
+    if (empty($contactId)) {
+      return '';
+    }
+
+    $contact = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('display_name', 'address_primary.country_id:label', 'address_primary.city', 'address_primary.country_id:abbr')
+      ->addWhere('id', '=', $contactId)
+      ->execute()
+      ->first();
+
+    if (!$contact) {
+      return '';
+    }
+
+    if (!empty($contact['address_primary.city']) && !empty($contact['address_primary.country_id:abbr'])) {
+      return $contact['address_primary.city'] . ' (' . $contact['address_primary.country_id:abbr'] . ')';
+    }
+
+    if (!empty($contact['address_primary.city'])) {
+      return $contact['address_primary.city'];
+    }
+
+    return '';
+  }
+
+  private function getTrainers($eventId) {
+    $trainers = [];
+
+    $participants = \Civi\Api4\Participant::get(TRUE)
+      ->addSelect('contact_id.first_name', 'contact_id.last_name')
+      ->addWhere('event_id', '=', $eventId)
+      ->addWhere('role_id', 'IN', [6]) // trainer
+      ->execute();
+    foreach ($participants as $participant) {
+      $trainers[] = $participant['contact_id.first_name'] . ' ' . $participant['contact_id.last_name'];
+    }
+
+    return $trainers;
+  }
 }
