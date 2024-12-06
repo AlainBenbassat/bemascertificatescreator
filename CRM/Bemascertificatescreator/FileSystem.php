@@ -64,7 +64,7 @@ class CRM_Bemascertificatescreator_FileSystem {
       $languageCode = 'en';
     }
 
-    return $this->certificateUrl . "/$languageCode/$certificateGuid";
+    return $this->certificateUrl . "/$languageCode/" . $this->eventCode . "/$certificateGuid";
   }
 
   private function writeFile(string $fileName, string $content) {
