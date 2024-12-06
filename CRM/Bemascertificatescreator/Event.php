@@ -264,7 +264,7 @@ EOF;
     $participants = \Civi\Api4\Participant::get(TRUE)
       ->addSelect('contact_id.first_name', 'contact_id.last_name')
       ->addWhere('event_id', '=', $eventId)
-      ->addWhere('role_id', 'IN', [6]) // trainer
+      ->addWhere('role_id', 'IN', [4, 6]) // spreker, trainer
       ->execute();
     foreach ($participants as $participant) {
       $trainers[] = $participant['contact_id.first_name'] . ' ' . $participant['contact_id.last_name'];
