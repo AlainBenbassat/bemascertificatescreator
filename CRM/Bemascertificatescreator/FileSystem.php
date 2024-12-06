@@ -2,6 +2,7 @@
 
 class CRM_Bemascertificatescreator_FileSystem {
   public $certificateDirectory = '';
+  public $certificateUrl = '';
 
   public function __construct(public int $year, public string $eventCode) {
     if (!defined('BEMAS_CERTIFICATES_ROOT')) {
@@ -24,6 +25,7 @@ class CRM_Bemascertificatescreator_FileSystem {
     }
 
     $this->certificateDirectory = BEMAS_CERTIFICATES_ROOT . "/$year/$eventCode";
+    $this->certificateUrl = BEMAS_CERTIFICATES_BASE_URL;
   }
 
   public function eventJsonExists() {
@@ -61,7 +63,7 @@ class CRM_Bemascertificatescreator_FileSystem {
     if (empty($languageCode)) {
       $languageCode = 'en';
     }
-//$this->certificateUrl = BEMAS_CERTIFICATES_BASE_URL . "/$eventCode";
+
     return $this->certificateUrl . "/$languageCode/$certificateGuid";
   }
 

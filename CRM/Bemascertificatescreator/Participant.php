@@ -52,8 +52,7 @@ $json = <<<EOF
   "first_name": "$this->firstName",
   "last_name": "$this->lastName",
   "course_id": "{$this->event->id}",
-  "course_code": "{$this->event->code}",
-  "course_date": "{$this->event->startDate}"
+  "course_code": "{$this->event->code}"
 }
 
 EOF;
