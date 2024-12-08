@@ -21,10 +21,10 @@ class CRM_Bemascertificatescreator_Generator {
         $numParticipantsCreated++;
       }
 
-      return "Event json created: $eventJsonCreated, #Participant json created: $numParticipantsCreated";
+      return "#Certificates created: $numParticipantsCreated";
     }
     else {
-      return 'Event json not created. Event type id = ' . $event->typeId . ' cannot have certificates';
+      return 'Cannot create certificates';
     }
   }
 

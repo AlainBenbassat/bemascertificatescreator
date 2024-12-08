@@ -49,6 +49,7 @@ class CRM_Bemascertificatescreator_Participant {
   public function toJson() {
 $json = <<<EOF
 {
+  "certificate_number": "UNKNOWN_CERTIFICATE_NUMBER",
   "first_name": "$this->firstName",
   "last_name": "$this->lastName",
   "course_id": "{$this->event->id}",

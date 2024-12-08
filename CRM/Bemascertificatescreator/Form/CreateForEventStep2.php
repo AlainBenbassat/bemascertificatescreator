@@ -75,7 +75,7 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
 
     $generator = new CRM_Bemascertificatescreator_Generator();
     $msg = $generator->createForEvent($event);
-    CRM_Core_Session::setStatus($msg, '', 'info');
+    CRM_Core_Session::setStatus('', $msg, 'info');
   }
 
   private function getJsonField(object $eventCertificate, string $lang, string $fieldName): string {
@@ -87,17 +87,17 @@ class CRM_Bemascertificatescreator_Form_CreateForEventStep2 extends CRM_Core_For
     $this->add('text', 'event_code', 'BEMAS code', ['size' => 20]);
 
     $this->add('text', 'title_nl', 'Titel opleiding (NL)', ['size' => 80]);
-    $this->add('textarea', 'description_nl', 'Omschrijving (NL)', ['cols' => 80]);
+    $this->add('wysiwyg', 'description_nl', 'Omschrijving (NL)', ['cols' => 80]);
     $this->add('text', 'location_nl', 'Locatie (NL)', ['size' => 80]);
     $this->add('text', 'dates_nl', 'Datums (NL)', ['size' => 80]);
 
     $this->add('text', 'title_fr', 'Titel opleiding (FR)', ['size' => 80]);
-    $this->add('textarea', 'description_fr', 'Omschrijving (FR)', ['cols' => 80]);
+    $this->add('wysiwyg', 'description_fr', 'Omschrijving (FR)', ['cols' => 80]);
     $this->add('text', 'location_fr', 'Locatie (FR)', ['size' => 80]);
     $this->add('text', 'dates_fr', 'Datums (FR)', ['size' => 80]);
 
     $this->add('text', 'title_en', 'Title opleiding (EN)', ['size' => 80]);
-    $this->add('textarea', 'description_en', 'Omschrijving (EN)', ['cols' => 80]);
+    $this->add('wysiwyg', 'description_en', 'Omschrijving (EN)', ['cols' => 80]);
     $this->add('text', 'location_en', 'Locatie (EN)', ['size' => 80]);
     $this->add('text', 'dates_en', 'Datums (EN)', ['size' => 80]);
   }

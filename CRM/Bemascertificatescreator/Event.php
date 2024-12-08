@@ -104,13 +104,15 @@ class CRM_Bemascertificatescreator_Event {
     $ids = [];
 
     $participants = \Civi\Api4\Participant::get(FALSE)
-      ->addSelect('id')
+      ->addSelect('id', 'participant_certificate.Geen_certificaat_genereren_voor_deze_persoon')
       ->addWhere('event_id', '=', $this->id)
       ->addWhere('status_id.is_counted', '=', TRUE)
       ->addWhere('role_id', 'IN', [1])
       ->execute();
     foreach ($participants as $participant) {
-      $ids[] = $participant['id'];
+      if (empty($participant['participant_certificate.Geen_certificaat_genereren_voor_deze_persoon'])) {
+        $ids[] = $participant['id'];
+      }
     }
 
     return $ids;
@@ -119,13 +121,17 @@ class CRM_Bemascertificatescreator_Event {
   public function toJson() {
     $courseTrainersJson = '"' . implode('", "', $this->trainers) . '"';
 
+    $descEN = json_encode($this->descriptionEN);
+    $descNL = json_encode($this->descriptionNL);
+    $descFR = json_encode($this->descriptionFR);
+
 $json = <<<EOF
 {
   "en": {
     "course_id": "$this->id",
     "course_code": "$this->code",
     "course_title": "$this->titleWithoutCodeEN",
-    "course_description": "$this->descriptionEN",
+    "course_description": $descEN,
     "course_dates": "$this->datesEN",
     "course_location": "$this->location",
     "course_trainers": [$courseTrainersJson]
@@ -134,7 +140,7 @@ $json = <<<EOF
     "course_id": "$this->id",
     "course_code": "$this->code",
     "course_title": "$this->titleWithoutCodeNL",
-    "course_description": "$this->descriptionNL",
+    "course_description": $descNL,
     "course_dates": "$this->datesNL",
     "course_location": "$this->location",
     "course_trainers": [$courseTrainersJson]
@@ -143,7 +149,7 @@ $json = <<<EOF
     "course_id": "$this->id",
     "course_code": "$this->code",
     "course_title": "$this->titleWithoutCodeFR",
-    "course_description": "$this->descriptionFR",
+    "course_description": $descFR,
     "course_dates": "$this->datesFR",
     "course_location": "$this->location",
     "course_trainers": [$courseTrainersJson]

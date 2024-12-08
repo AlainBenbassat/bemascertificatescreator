@@ -57,6 +57,9 @@ class CRM_Bemascertificatescreator_FileSystem {
       $certificateGuid = $this->getGUID();
     }
 
+    // replace the GUID placeholder in the json with actual guid
+    $json = str_replace('UNKNOWN_CERTIFICATE_NUMBER', $certificateGuid, $json);
+
     $path = $this->certificateDirectory . '/' . $certificateGuid . '.json';
     $this->writeFile($path, $json);
 
