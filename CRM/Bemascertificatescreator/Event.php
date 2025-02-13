@@ -18,6 +18,7 @@ class CRM_Bemascertificatescreator_Event {
   public string $datesNL;
   public string $datesFR;
   public int $year;
+  public int $yearFromCourseCode;
   public string $languageCode;
   public string $location;
   public array $trainers;
@@ -41,6 +42,7 @@ class CRM_Bemascertificatescreator_Event {
       $this->dates = $this->getCourseDates($event);
       $this->year = substr($this->dates[0], 0, 4);
       $this->code = $this->extractCodeFromTitle($this->title);
+      $this->yearFromCourseCode = $this->getYearFromCode();
       $this->languageCode = $this->getLanguageFromCode();
       $this->titleWithoutCode = $this->removeCodeFromTitle($this->code, $this->title);
       $this->location = $this->getLocation($event['Opleiding_lesduur.Eventlocatie']);
@@ -93,6 +95,7 @@ class CRM_Bemascertificatescreator_Event {
       $this->datesNL = '';
       $this->datesFR = '';
       $this->year = 0;
+      $this->yearFromCourseCode = 0;
       $this->code = '';
       $this->titleWithoutCode = '';
       $this->location = '';
@@ -185,6 +188,19 @@ EOF;
     else {
       return 'en';
     }
+  }
+
+  private function getYearFromCode() {
+    $matches = [];
+    $pattern = "/[A-Z][A-Z]?([0-9][0-9])/"; // one or two letters, followed by 2 digits
+    $retval = preg_match($pattern, $this->code, $matches);
+    if ($retval == 1) {
+      if (!empty($matches[1])) {
+        return '20' . $matches[1];
+      }
+    }
+
+    return date('Y');
   }
 
   private function getCourseDates($event) {

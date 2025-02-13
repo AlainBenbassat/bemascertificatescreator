@@ -8,7 +8,7 @@ class CRM_Bemascertificatescreator_Generator {
     $numParticipantsCreated = 0;
 
     if ($this->isEventTypeAllowedForCertificate($event->typeId)) {
-      $certFS = new CRM_Bemascertificatescreator_FileSystem($event->year, $event->code);
+      $certFS = new CRM_Bemascertificatescreator_FileSystem($event->yearFromCourseCode, $event->code);
       $certFS->saveEventJson($event->toJson());
 
       $eventJsonCreated = 'Yes';
